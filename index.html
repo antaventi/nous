@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOUS GROUP INC</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            font-family: 'Share Tech Mono', monospace;
+            color: #ff6600;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .crt-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: 
+                radial-gradient(ellipse at center, #000000 0%, #0a0a0a 70%, #1a1a1a 100%),
+                linear-gradient(to bottom, rgba(255,102,0,0.03) 0%, transparent 50%);
+            padding: 20px;
+            overflow: hidden;
+            animation: flicker 0.15s infinite;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0,0,0,0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .glow {
+            text-shadow: 
+                0 0 5px #ff6600,
+                0 0 10px #ff6600,
+                0 0 15px #ff6600,
+                0 0 20px #ff3300,
+                0 0 35px #ff3300,
+                0 0 40px #ff3300;
+        }
+        
+        .terminal {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 14px;
+            line-height: 1.2;
+            z-index: 1;
+            height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .prompt {
+            color: #00ff00;
+            margin-right: 10px;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #ff6600;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+        }
+        
+        .rain-column {
+            position: absolute;
+            top: -100px;
+            font-size: 14px;
+            color: #00ff00;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            animation: fall linear infinite;
+        }
+        
+        .consciousness-stream {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.1;
+        }
+        
+        .thought-particle {
+            position: absolute;
+            color: #ff66ff;
+            font-size: 12px;
+            animation: float 20s infinite linear;
+        }
+        
+        .protocol {
+            color: #ffff00;
+            margin: 15px 0;
+        }
+        
+        .online-counter {
+            color: #00ffff;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            animation: pulse 3s infinite;
+        }
+
+        .radio-interface {
+            position: fixed;
+            top: 40px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            padding: 8px;
+            font-size: 10px;
+            color: #00ff00;
+            z-index: 100;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .radio-interface:hover {
+            opacity: 1;
+        }
+
+        .radio-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .radio-btn {
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 3px 8px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            font-size: 9px;
+            transition: all 0.3s ease;
+        }
+
+        .radio-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .volume-slider {
+            width: 60px;
+            height: 4px;
+            background: #333;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .volume-slider:hover {
+            opacity: 1;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            cursor: pointer;
+            border-radius: 0;
+        }
+        
+        .message-input {
+            background: transparent;
+            border: 1px solid #ff6600;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 5px;
+            margin: 10px 0;
+            width: 300px;
+        }
+        
+        .send-btn {
+            background: #ff6600;
+            color: #000;
+            border: none;
+            padding: 5px 15px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .mental-echo {
+            color: #00ff00;
+            margin: 5px 0;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+        
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        .corrupted {
+            color: #ff0066;
+            animation: corruption 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 0.97; }
+            50% { opacity: 0.99; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(100vw, 100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 0.8; }
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            5% { clip: rect(12px, 9999px, 59px, 0); }
+            10% { clip: rect(48px, 9999px, 29px, 0); }
+            15% { clip: rect(42px, 9999px, 73px, 0); }
+            20% { clip: rect(63px, 9999px, 27px, 0); }
+            25% { clip: rect(34px, 9999px, 55px, 0); }
+            30% { clip: rect(86px, 9999px, 73px, 0); }
+            35% { clip: rect(20px, 9999px, 20px, 0); }
+            40% { clip: rect(26px, 9999px, 60px, 0); }
+            45% { clip: rect(25px, 9999px, 66px, 0); }
+            50% { clip: rect(57px, 9999px, 98px, 0); }
+            55% { clip: rect(5px, 9999px, 46px, 0); }
+            60% { clip: rect(82px, 9999px, 31px, 0); }
+            65% { clip: rect(54px, 9999px, 27px, 0); }
+            70% { clip: rect(28px, 9999px, 99px, 0); }
+            75% { clip: rect(45px, 9999px, 69px, 0); }
+            80% { clip: rect(23px, 9999px, 85px, 0); }
+            85% { clip: rect(54px, 9999px, 84px, 0); }
+            90% { clip: rect(45px, 9999px, 47px, 0); }
+            95% { clip: rect(37px, 9999px, 20px, 0); }
+            100% { clip: rect(4px, 9999px, 91px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+        
+        @keyframes corruption {
+            0%, 100% { 
+                text-shadow: 0 0 5px #ff0066, 0 0 10px #ff0066;
+                filter: hue-rotate(0deg);
+            }
+            50% { 
+                text-shadow: 0 0 10px #ff0066, 0 0 20px #ff0066;
+                filter: hue-rotate(180deg);
+            }
+        }
+        
+        /* Scrollbar styling */
+        .terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .terminal::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        .terminal::-webkit-scrollbar-thumb {
+            background: #ff6600;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-screen">
+        <div class="scanlines"></div>
+        <div class="matrix-rain" id="matrixRain"></div>
+        <div class="consciousness-stream" id="consciousnessStream"></div>
+        
+        <div class="online-counter" id="onlineCounter">
+            CONSCIOUSNESS ONLINE: <span id="onlineCount">42,791</span>
+        </div>
+
+        <!-- Radio Interface -->
+        <div class="radio-interface">
+            <div class="radio-controls">
+                <button class="radio-btn" id="radioPower">off</button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+            </div>
+        </div>
+        
+        <div class="terminal">
+            <div class="glow">
+                <pre style="color: #00ffff; font-size: 12px; line-height: 1.1;">
+  ███╗   ██╗ ██████╗ ██╗   ██╗███████╗     ██████╗ ██████╗  ██████╗ ██╗   ██╗██████╗ 
+  ████╗  ██║██╔═══██╗██║   ██║██╔════╝    ██╔════╝ ██╔══██╗██╔═══██╗██║   ██║██╔══██╗
+  ██╔██╗ ██║██║   ██║██║   ██║███████╗    ██║  ███╗██████╔╝██║   ██║██║   ██║██████╔╝
+  ██║╚██╗██║██║   ██║██║   ██║╚════██║    ██║   ██║██╔══██╗██║   ██║██║   ██║██╔═══╝ 
+  ██║ ╚████║╚██████╔╝╚██████╔╝███████║    ╚██████╔╝██║  ██║╚██████╔╝╚██████╔╝██║     
+  ╚═╝  ╚═══╝ ╚═════╝  ╚═════╝ ╚══════╝     ╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝     
+                </pre>
+                
+                <div class="protocol glitch-text" data-text="> TELEPATHIC NETWORK PROTOCOL v3.14">> TELEPATHIC NETWORK PROTOCOL v3.14</div>
+                <div class="protocol">> NOOSPHERE INTERFACE <span class="corrupted">CORRUPTED</span></div>
+                <div class="protocol">> COLLECTIVE UNCONSCIOUS: <span class="glitch-text" data-text="GLITCHING">CONNECTED</span></div>
+                <br>
+                
+                <div class="protocol">> CURRENT NOOSPHERE ACTIVITY:</div>
+                <div id="activityFeed"></div>
+                <br>
+                
+                <div class="protocol glitch-text" data-text="> BROADCAST TO NOOSPHERE:">> BROADCAST TO NOOSPHERE:</div>
+                <input type="text" class="message-input" id="noosphereMessage" placeholder="ENTER YOUR THOUGHT..." maxlength="140">
+                <button class="send-btn" onclick="broadcastToNoosphere()">TRANSMIT</button>
+                <br><br>
+                
+                <div id="echoChamber"></div>
+                    
+                <div class="command">
+                    <span class="prompt">NOOSPHERE></span><span class="glitch-text" data-text="SIGNAL_DEGRADED">TELEPATHIC LINK ESTABLISHED</span>
+                    <span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio System
+        class NoosphereRadio {
+            constructor() {
+                this.audioContext = null;
+                this.noiseSource = null;
+                this.filter = null;
+                this.gainNode = null;
+                this.isPlaying = false;
+                this.volume = 0.5;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+            }
+            
+            setupEventListeners() {
+                document.getElementById('radioPower').addEventListener('click', () => this.togglePower());
+                document.getElementById('volumeSlider').addEventListener('input', (e) => this.setVolume(e.target.value / 100));
+            }
+            
+            togglePower() {
+                if (!this.isPlaying) {
+                    this.startAudio();
+                    document.getElementById('radioPower').textContent = 'on';
+                    document.getElementById('radioPower').style.background = '#00ff00';
+                    document.getElementById('radioPower').style.color = '#000';
+                } else {
+                    this.stopAudio();
+                    document.getElementById('radioPower').textContent = 'off';
+                    document.getElementById('radioPower').style.background = 'transparent';
+                    document.getElementById('radioPower').style.color = '#00ff00';
+                }
+                this.isPlaying = !this.isPlaying;
+            }
+            
+            startAudio() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create white noise
+                    const bufferSize = 2 * this.audioContext.sampleRate;
+                    const noiseBuffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                    const output = noiseBuffer.getChannelData(0);
+                    
+                    for (let i = 0; i < bufferSize; i++) {
+                        output[i] = Math.random() * 2 - 1;
+                    }
+                    
+                    this.noiseSource = this.audioContext.createBufferSource();
+                    this.noiseSource.buffer = noiseBuffer;
+                    this.noiseSource.loop = true;
+                    
+                    // Create filter for radio effect
+                    this.filter = this.audioContext.createBiquadFilter();
+                    this.filter.type = 'bandpass';
+                    this.filter.frequency.value = 800;
+                    this.filter.Q.value = 1.0;
+                    
+                    // Create gain node for volume control
+                    this.gainNode = this.audioContext.createGain();
+                    this.gainNode.gain.value = this.volume;
+                    
+                    // Connect nodes
+                    this.noiseSource.connect(this.filter);
+                    this.filter.connect(this.gainNode);
+                    this.gainNode.connect(this.audioContext.destination);
+                    
+                    this.noiseSource.start();
+                    
+                    // Start periodic glitches
+                    this.startGlitches();
+                    
+                } catch (error) {
+                    console.log('Audio initialization failed:', error);
+                }
+            }
+            
+            startGlitches() {
+                setInterval(() => {
+                    if (this.isPlaying && this.filter) {
+                        // Random filter frequency changes
+                        this.filter.frequency.setValueAtTime(
+                            200 + Math.random() * 2000, 
+                            this.audioContext.currentTime
+                        );
+                        
+                        // Occasional volume drops (static bursts)
+                        if (Math.random() > 0.7) {
+                            this.gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                            setTimeout(() => {
+                                if (this.gainNode) {
+                                    this.gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime + 0.1);
+                                }
+                            }, 100);
+                        }
+                    }
+                }, 2000);
+            }
+            
+            setVolume(level) {
+                this.volume = level;
+                if (this.gainNode) {
+                    this.gainNode.gain.setValueAtTime(level, this.audioContext.currentTime);
+                }
+            }
+            
+            stopAudio() {
+                if (this.noiseSource) {
+                    this.noiseSource.stop();
+                    this.noiseSource = null;
+                }
+                if (this.audioContext) {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+            }
+        }
+
+        // Initialize radio when user interacts with page
+        let radio;
+        function initRadio() {
+            radio = new NoosphereRadio();
+            document.removeEventListener('click', initRadio);
+        }
+        document.addEventListener('click', initRadio);
+
+        // Matrix rain effect
+        function createMatrixRain() {
+            const matrixRain = document.getElementById('matrixRain');
+            const characters = '0101010101アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'rain-column';
+                column.style.left = (i * 20) + 'px';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = (Math.random() * 5) + 's';
+                
+                let content = '';
+                const length = Math.floor(Math.random() * 30) + 20;
+                for (let j = 0; j < length; j++) {
+                    content += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                
+                column.textContent = content;
+                matrixRain.appendChild(column);
+            }
+        }
+        
+        // Consciousness stream particles
+        function createConsciousnessStream() {
+            const stream = document.getElementById('consciousnessStream');
+            const thoughts = ['ERROR', 'CORRUPT', 'GLITCH', 'STATIC', 'NOISE', 'SIGNAL_LOST', 'DATA_CORRUPTED'];
+            
+            setInterval(() => {
+                if (Math.random() > 0.5) {
+                    const particle = document.createElement('div');
+                    particle.className = 'thought-particle';
+                    particle.textContent = thoughts[Math.floor(Math.random() * thoughts.length)];
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                    
+                    stream.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 20000);
+                }
+            }, 800);
+        }
+        
+        // Dynamic online counter with glitches - updated to tens of thousands and slower updates
+        function updateOnlineCounter() {
+            const base = 40000;
+            const variation = Math.floor(Math.random() * 10000);
+            const onlineCount = base + variation;
+            
+            if (Math.random() > 0.9) {
+                document.getElementById('onlineCount').textContent = 'ERROR_' + Math.floor(Math.random() * 999);
+                setTimeout(() => {
+                    document.getElementById('onlineCount').textContent = onlineCount.toLocaleString();
+                }, 800);
+            } else {
+                document.getElementById('onlineCount').textContent = onlineCount.toLocaleString();
+            }
+        }
+        
+        // Expanded Noosphere activity feed
+        const activityTemplates = [
+            "consciousness #{id} is experiencing deja vu",
+            "neural pattern #{id} accessing collective memory",
+            "telepathic link established with mind #{id}",
+            "psychic resonance detected from user #{id}",
+            "mental projection received from consciousness #{id}",
+            "thought transmission completed to #{id}",
+            "empathic connection strengthened with #{id}",
+            "intuitive insight shared by mind #{id}",
+            "dream data stream from consciousness #{id}",
+            "synchronistic event logged for user #{id}",
+            "SIGNAL_LOST from consciousness #{id}",
+            "DATA_CORRUPTION in stream #{id}",
+            "PROTOCOL_VIOLATION by user #{id}",
+            "STATIC_NOISE overwhelming signal #{id}",
+            "consciousness #{id} accessing akashic records",
+            "user #{id} experiencing kundalini awakening",
+            "third eye activation detected #{id}",
+            "astral projection initiated by #{id}",
+            "quantum entanglement observed #{id}",
+            "consciousness #{id} bridging dimensions"
+        ];
+        
+        function generateActivity() {
+            const feed = document.getElementById('activityFeed');
+            if (Math.random() > 0.6) {
+                const activity = document.createElement('div');
+                
+                if (Math.random() > 0.7) {
+                    activity.className = 'mental-echo corrupted';
+                } else if (Math.random() > 0.5) {
+                    activity.className = 'mental-echo glitch-text';
+                    activity.setAttribute('data-text', '> ' + activityTemplates[Math.floor(Math.random() * activityTemplates.length)].replace('#{id}', Math.floor(Math.random() * 999999) + 100000));
+                } else {
+                    activity.className = 'mental-echo';
+                }
+                
+                activity.style.animationDelay = (Math.random() * 2) + 's';
+                
+                const template = activityTemplates[Math.floor(Math.random() * activityTemplates.length)];
+                const id = Math.floor(Math.random() * 999999) + 100000;
+                activity.textContent = '> ' + template.replace('#{id}', id);
+                
+                feed.appendChild(activity);
+                
+                while (feed.children.length > 8) {
+                    feed.removeChild(feed.firstChild);
+                }
+            }
+        }
+        
+        // Broadcast to noosphere
+        function broadcastToNoosphere() {
+            const messageInput = document.getElementById('noosphereMessage');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                const echoChamber = document.getElementById('echoChamber');
+                const echo = document.createElement('div');
+                
+                if (Math.random() > 0.6) {
+                    echo.className = 'mental-echo corrupted';
+                } else {
+                    echo.className = 'mental-echo';
+                }
+                
+                echo.textContent = '> THOUGHT TRANSMITTED: "' + message + '" - ECHOING IN NOOSPHERE';
+                echoChamber.appendChild(echo);
+                
+                messageInput.value = '';
+                
+                setTimeout(() => {
+                    const responses = [
+                        "consciousness resonates with your thought",
+                        "telepathic feedback received",
+                        "mental echo growing stronger",
+                        "other minds are listening",
+                        "SIGNAL_DEGRADED: transmission corrupted",
+                        "STATIC_INTERFERENCE detected"
+                    ];
+                    const response = document.createElement('div');
+                    
+                    if (Math.random() > 0.4) {
+                        response.className = 'mental-echo corrupted';
+                    } else {
+                        response.className = 'mental-echo';
+                    }
+                    
+                    response.textContent = '> NOOSPHERE: ' + responses[Math.floor(Math.random() * responses.length)];
+                    echoChamber.appendChild(response);
+                }, 2000);
+            }
+        }
+
+        // Random screen glitch effect
+        function triggerScreenGlitch() {
+            const screen = document.querySelector('.crt-screen');
+            screen.style.animation = 'none';
+            screen.style.filter = 'hue-rotate(180deg) contrast(150%)';
+            
+            setTimeout(() => {
+                screen.style.animation = 'flicker 0.15s infinite';
+                screen.style.filter = 'none';
+            }, 100);
+        }
+        
+        // Initialize effects
+        window.onload = function() {
+            createMatrixRain();
+            createConsciousnessStream();
+            updateOnlineCounter();
+            
+            setInterval(updateOnlineCounter, 10000);
+            setInterval(generateActivity, 1200);
+            
+            setInterval(() => {
+                if (Math.random() > 0.8) {
+                    document.querySelector('.crt-screen').style.animation = 'none';
+                    setTimeout(() => {
+                        document.querySelector('.crt-screen').style.animation = 'flicker 0.15s infinite';
+                    }, 50);
+                }
+                
+                if (Math.random() > 0.9) {
+                    triggerScreenGlitch();
+                }
+            }, 3000);
+            
+            document.getElementById('noosphereMessage').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    broadcastToNoosphere();
+                }
+            });
+        };
+        
+        window.addEventListener('resize', function() {
+            document.getElementById('matrixRain').innerHTML = '';
+            createMatrixRain();
+        });
+    </script>
+</body>
+</html>
